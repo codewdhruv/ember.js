@@ -1,10 +1,6 @@
 import { deprecate } from '@ember/debug';
 import { DEBUG } from '@glimmer/env';
 
-/**
- @module @ember/error
-*/
-
 /** ErrorConstructor without node extensions */
 interface BrowserErrorConstructor {
   new (message?: string): Error;
@@ -14,12 +10,6 @@ interface BrowserErrorConstructor {
 
 /**
   The JavaScript Error object used by Ember.assert.
-
-  @class Error
-  @namespace Ember
-  @extends Error
-  @constructor
-  @public
   @deprecated
 */
 let EmberError: BrowserErrorConstructor;

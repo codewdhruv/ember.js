@@ -17,7 +17,7 @@ import { isProxy, lookupDescriptor } from '@ember/-internals/utils';
 import type { AnyFn } from '@ember/-internals/utility-types';
 import Controller from '@ember/controller';
 import type { ControllerQueryParamType } from '@ember/controller';
-import { assert, info, isTesting } from '@ember/debug';
+import { assert, deprecate, info, isTesting } from '@ember/debug';
 import EngineInstance from '@ember/engine/instance';
 import { dependentKeyCompat } from '@ember/object/compat';
 import { once } from '@ember/runloop';
@@ -65,6 +65,16 @@ type RouteTransitionState<R extends Route> = TransitionState<R> & {
 
 type MaybeParameters<T> = T extends AnyFn ? Parameters<T> : unknown[];
 type MaybeReturnType<T> = T extends AnyFn ? ReturnType<T> : unknown;
+
+interface StoreLike {
+  find(type: string, value: unknown): unknown;
+}
+
+function isStoreLike(store: unknown): store is StoreLike {
+  return (
+    typeof store === 'object' && store !== null && typeof (store as StoreLike).find === 'function'
+  );
+}
 
 export const ROUTE_CONNECTIONS = new WeakMap();
 const RENDER = Symbol('render');
@@ -1479,8 +1489,22 @@ class Route<T = unknown>
     @param {Object} value the value passed to find
     @private
   */
-  findModel(...args: any[]) {
-    return (get(this, 'store') as any).find(...args);
+  findModel(type: string, value: unknown) {
+    deprecate(
+      `The implicit model loading behavior for routes is deprecated. Please define an explicit model hook for ${this.fullRouteName}.`,
+      false,
+      {
+        id: 'deprecate-implicit-route-model',
+        for: 'ember-source',
+        since: { available: '4.12.0' },
+        until: '6.0.0',
+      }
+    );
+
+    const store = get(this, 'store');
+    assert('Expected route to have a store with a find method', isStoreLike(store));
+
+    return store.find(type, value);
   }
 
   /**
