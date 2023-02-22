@@ -129,3 +129,38 @@ pipeline:
                     with:
                       node-version: 14.x
                       cache: yarn
+              - step:
+                  type: Run
+                  name: install dependencies
+                  identifier: install_dependencies
+                  spec:
+                    shell: Sh
+                    command: yarn install --frozen-lockfile --non-interactive
+              - step:
+                  type: Run
+                  name: build
+                  identifier: build
+                  spec:
+                    shell: Sh
+                    command: yarn ember build
+                    envVariables:
+                      DISABLE_SOURCE_MAPS: "true"
+                      BROCCOLI_ENV: production
+              - step:
+                  type: Action
+                  name: Upload build
+                  identifier: Upload_build
+                  spec:
+                    uses: actions/upload-artifact@v3
+                    with:
+                      name: dist
+                      path: dist
+              - step:
+                  type: Run
+                  name: test
+                  identifier: test
+                  spec:
+                    shell: Sh
+                    command: yarn test
+                    envVariables:
+                      TEST_SUITE: each-package
