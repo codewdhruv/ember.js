@@ -55,3 +55,47 @@ pipeline:
                   spec:
                     shell: Sh
                     command: yarn lint
+    - stage:
+        name: Type Checking
+        identifier: Type_Checking
+        description: ""
+        type: CI
+        spec:
+          cloneCodebase: true
+          platform:
+            os: Linux
+            arch: Amd64
+          runtime:
+            type: Cloud
+            spec: {}
+          execution:
+            steps:
+              - step:
+                  type: Action
+                  name: Checkout
+                  identifier: Checkout
+                  spec:
+                    uses: actions/checkout@v3
+              - step:
+                  type: Action
+                  name: Setup node
+                  identifier: Setup_node
+                  spec:
+                    uses: actions/setup-node@v3
+                    with:
+                      node-version: 14.x
+                      cache: yarn
+              - step:
+                  type: Run
+                  name: install dependencies
+                  identifier: install_dependencies
+                  spec:
+                    shell: Sh
+                    command: yarn install --frozen-lockfile --non-interactive
+              - step:
+                  type: Run
+                  name: Check published types
+                  identifier: Check_published_types
+                  spec:
+                    shell: Sh
+                    command: yarn type-check:types
