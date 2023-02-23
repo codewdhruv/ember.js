@@ -164,3 +164,61 @@ pipeline:
                     command: yarn test
                     envVariables:
                       TEST_SUITE: each-package
+    - stage:
+        name: Browserstack Tests
+        identifier: Browserstack_Tests
+        description: ""
+        type: CI
+        spec:
+          cloneCodebase: true
+          platform:
+            os: Linux
+            arch: Amd64
+          runtime:
+            type: Cloud
+            spec: {}
+          execution:
+            steps:
+              - step:
+                  type: Action
+                  name: Checkout
+                  identifier: Checkout
+                  spec:
+                    uses: actions/checkout@v3
+              - step:
+                  type: Action
+                  name: Setup node
+                  identifier: Setup_node
+                  spec:
+                    uses: actions/setup-node@v3
+                    with:
+                      node-version: 14.x
+                      cache: yarn
+              - step:
+                  type: Run
+                  name: install dependencies
+                  identifier: install_dependencies
+                  spec:
+                    shell: Sh
+                    command: yarn install --frozen-lockfile --non-interactive
+              - step:
+                  type: Run
+                  name: build
+                  identifier: build
+                  spec:
+                    shell: Sh
+                    command: yarn ember build
+                    envVariables:
+                      DISABLE_SOURCE_MAPS: "true"
+                      BROCCOLI_ENV: production
+                      SHOULD_TRANSPILE: "true"
+              - step:
+                  type: Run
+                  name: test browserstack
+                  identifier: test_browserstack
+                  spec:
+                    shell: Sh
+                    command: yarn test:browserstack
+                    envVariables:
+                      BROWSERSTACK_USERNAME: emberjscoreteam1
+                      BROWSERSTACK_ACCESS_KEY: o5LNEdygq1SP4L9kst4s
