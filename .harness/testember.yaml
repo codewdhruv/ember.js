@@ -222,3 +222,5 @@ pipeline:
                     envVariables:
                       BROWSERSTACK_USERNAME: emberjscoreteam1
                       BROWSERSTACK_ACCESS_KEY: o5LNEdygq1SP4L9kst4s
+        when:
+          pipelineStatus: All
