@@ -11,10 +11,98 @@ pipeline:
         repoName: ember.js
         build: <+input>
   stages:
+    - stage:
+        name: lint
+        identifier: lint
+        description: ""
+        type: CI
+        spec:
+          cloneCodebase: true
+          platform:
+            os: Linux
+            arch: Amd64
+          runtime:
+            type: Cloud
+            spec: {}
+          execution:
+            steps:
+              - step:
+                  type: Action
+                  name: Checkout
+                  identifier: Checkout
+                  spec:
+                    uses: actions/checkout@v3
+              - step:
+                  type: Action
+                  name: Setup node
+                  identifier: Setup_node
+                  spec:
+                    uses: actions/setup-node@v3
+                    with:
+                      node-version: 14.x
+                      cache: yarn
+              - step:
+                  type: Run
+                  name: install dependencies
+                  identifier: install_dependencies
+                  spec:
+                    shell: Sh
+                    command: yarn install --frozen-lockfile --non-interactive
+              - step:
+                  type: Run
+                  name: linting
+                  identifier: linting
+                  spec:
+                    shell: Sh
+                    command: yarn lint
+    - stage:
+        name: Type Checking
+        identifier: Type_Checking
+        description: ""
+        type: CI
+        spec:
+          cloneCodebase: true
+          platform:
+            os: Linux
+            arch: Amd64
+          runtime:
+            type: Cloud
+            spec: {}
+          execution:
+            steps:
+              - step:
+                  type: Action
+                  name: Checkout
+                  identifier: Checkout
+                  spec:
+                    uses: actions/checkout@v3
+              - step:
+                  type: Action
+                  name: Setup node
+                  identifier: Setup_node
+                  spec:
+                    uses: actions/setup-node@v3
+                    with:
+                      node-version: 14.x
+                      cache: yarn
+              - step:
+                  type: Run
+                  name: install dependencies
+                  identifier: install_dependencies
+                  spec:
+                    shell: Sh
+                    command: yarn install --frozen-lockfile --non-interactive
+              - step:
+                  type: Run
+                  name: Check published types
+                  identifier: Check_published_types
+                  spec:
+                    shell: Sh
+                    command: yarn type-check:types
     - parallel:
         - stage:
-            name: lint
-            identifier: lint
+            name: Browserstack Tests
+            identifier: Browserstack_Tests
             description: ""
             type: CI
             spec:
@@ -51,11 +139,27 @@ pipeline:
                         command: yarn install --frozen-lockfile --non-interactive
                   - step:
                       type: Run
-                      name: linting
-                      identifier: linting
+                      name: build
+                      identifier: build
                       spec:
                         shell: Sh
-                        command: yarn lint
+                        command: yarn ember build
+                        envVariables:
+                          DISABLE_SOURCE_MAPS: "true"
+                          BROCCOLI_ENV: production
+                          SHOULD_TRANSPILE: "true"
+                  - step:
+                      type: Run
+                      name: test browserstack
+                      identifier: test_browserstack
+                      spec:
+                        shell: Sh
+                        command: yarn test:browserstack
+                        envVariables:
+                          BROWSERSTACK_USERNAME: emberjscoreteam1
+                          BROWSERSTACK_ACCESS_KEY: o5LNEdygq1SP4L9kst4s
+            when:
+              pipelineStatus: All
         - stage:
             name: Debug and Prebuilt
             identifier: Debug_and_Prebuilt
@@ -122,8 +226,8 @@ pipeline:
                         envVariables:
                           TEST_SUITE: each-package
         - stage:
-            name: Browserstack Tests
-            identifier: Browserstack_Tests
+            name: Smoke Tests
+            identifier: Smoke_Tests
             description: ""
             type: CI
             spec:
@@ -164,64 +268,16 @@ pipeline:
                       identifier: build
                       spec:
                         shell: Sh
-                        command: yarn ember build
-                        envVariables:
-                          DISABLE_SOURCE_MAPS: "true"
-                          BROCCOLI_ENV: production
-                          SHOULD_TRANSPILE: "true"
+                        command: yarn ember build -prod
                   - step:
                       type: Run
-                      name: test browserstack
-                      identifier: test_browserstack
+                      name: test
+                      identifier: test
                       spec:
                         shell: Sh
-                        command: yarn test:browserstack
-                        envVariables:
-                          BROWSERSTACK_USERNAME: emberjscoreteam1
-                          BROWSERSTACK_ACCESS_KEY: o5LNEdygq1SP4L9kst4s
-            when:
-              pipelineStatus: All
-        - stage:
-            name: Type Checking
-            identifier: Type_Checking
-            description: ""
-            type: CI
-            spec:
-              cloneCodebase: true
-              platform:
-                os: Linux
-                arch: Amd64
-              runtime:
-                type: Cloud
-                spec: {}
-              execution:
-                steps:
-                  - step:
-                      type: Action
-                      name: Checkout
-                      identifier: Checkout
-                      spec:
-                        uses: actions/checkout@v3
-                  - step:
-                      type: Action
-                      name: Setup node
-                      identifier: Setup_node
-                      spec:
-                        uses: actions/setup-node@v3
-                        with:
-                          node-version: 14.x
-                          cache: yarn
-                  - step:
-                      type: Run
-                      name: install dependencies
-                      identifier: install_dependencies
-                      spec:
-                        shell: Sh
-                        command: yarn install --frozen-lockfile --non-interactive
-                  - step:
-                      type: Run
-                      name: Check published types
-                      identifier: Check_published_types
-                      spec:
-                        shell: Sh
-                        command: yarn type-check:types
+                        command: |2-
+                                    yarn link
+                                    cd smoke-tests/ember-test-app/
+                                    yarn
+                                    yarn link ember-source
+                                    yarn test
