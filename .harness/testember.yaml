@@ -99,6 +99,36 @@ pipeline:
                   spec:
                     shell: Sh
                     command: yarn type-check:types
+    - stage:
+        name: Basic Test
+        identifier: Basic_Test
+        description: ""
+        type: CI
+        spec:
+          cloneCodebase: true
+          platform:
+            os: Linux
+            arch: Amd64
+          runtime:
+            type: Cloud
+            spec: {}
+          execution:
+            steps:
+              - step:
+                  type: Action
+                  name: Checkout
+                  identifier: Checkout
+                  spec:
+                    uses: actions/checkout@v3
+              - step:
+                  type: Action
+                  name: Setup Node
+                  identifier: Setup_Node
+                  spec:
+                    uses: actions/setup-node@v3
+                    with:
+                      node-version: 14.x
+                      cache: yarn
     - parallel:
         - stage:
             name: Browserstack Tests
