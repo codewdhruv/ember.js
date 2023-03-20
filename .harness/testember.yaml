@@ -162,7 +162,7 @@ pipeline:
                   spec:
                     shell: Sh
                     command: |
-                      sudo sysctl -w kernel.unprivileged_userns_clone=1
+                      sudo chmod -R 777 .
                       sudo yarn test
                     envVariables:
                       TEST_SUITE: each-package
