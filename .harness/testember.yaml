@@ -346,3 +346,4 @@ pipeline:
                                     yarn
                                     yarn link ember-source
                                     yarn test
+  allowStageExecutions: true
