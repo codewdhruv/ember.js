@@ -183,7 +183,7 @@ pipeline:
                     shell: Sh
                     command: |
                       sudo chmod -R 777 .
-                      sudo yarn test
+                      sudo yarn test --no-sandbox
                     envVariables:
                       TEST_SUITE: each-package
                   when:
