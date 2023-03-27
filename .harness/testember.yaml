@@ -41,6 +41,9 @@ pipeline:
                     with:
                       node-version: 14.x
                       cache: yarn
+                  when:
+                    stageStatus: All
+                  failureStrategies: []
               - step:
                   type: Run
                   name: install dependencies
@@ -48,6 +51,9 @@ pipeline:
                   spec:
                     shell: Sh
                     command: yarn install --frozen-lockfile --non-interactive
+                  when:
+                    stageStatus: All
+                  failureStrategies: []
               - step:
                   type: Run
                   name: linting
@@ -55,6 +61,9 @@ pipeline:
                   spec:
                     shell: Sh
                     command: yarn lint
+                  when:
+                    stageStatus: All
+                  failureStrategies: []
     - stage:
         name: Type Checking
         identifier: Type_Checking
