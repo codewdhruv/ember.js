@@ -138,6 +138,9 @@ pipeline:
                     with:
                       node-version: 14.x
                       cache: yarn
+                  when:
+                    stageStatus: All
+                  failureStrategies: []
               - step:
                   type: Run
                   name: Install dependencies
@@ -145,6 +148,9 @@ pipeline:
                   spec:
                     shell: Sh
                     command: yarn install --frozen-lockfile --non-interactive
+                  when:
+                    stageStatus: All
+                  failureStrategies: []
               - step:
                   type: Run
                   name: build
@@ -155,6 +161,9 @@ pipeline:
                     envVariables:
                       DISABLE_SOURCE_MAPS: "true"
                       BROCCOLI_ENV: production
+                  when:
+                    stageStatus: All
+                  failureStrategies: []
               - step:
                   type: Action
                   name: Upload build
@@ -164,6 +173,9 @@ pipeline:
                     with:
                       name: dist
                       path: dist
+                  when:
+                    stageStatus: All
+                  failureStrategies: []
               - step:
                   type: Run
                   name: test
@@ -175,6 +187,9 @@ pipeline:
                       sudo yarn test
                     envVariables:
                       TEST_SUITE: each-package
+                  when:
+                    stageStatus: All
+                  failureStrategies: []
     - parallel:
         - stage:
             name: Browserstack Tests
