@@ -146,7 +146,7 @@ pipeline:
                   identifier: Install_dependencies
                   spec:
                     connectorRef: harnessnew
-                    image: circleci/node:14
+                    image: node:slim
                     shell: Sh
                     command: |-
                       yarn install --frozen-lockfile --non-interactive
