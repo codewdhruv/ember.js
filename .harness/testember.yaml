@@ -151,7 +151,6 @@ pipeline:
                     command: |-
                       yarn install --frozen-lockfile --non-interactive
                       yarn ember build
-                      sudo chmod -R 777 .
                       yarn test
                   when:
                     stageStatus: All
