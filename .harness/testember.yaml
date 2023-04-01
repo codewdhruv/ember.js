@@ -151,7 +151,7 @@ pipeline:
                     command: |-
                       yarn install --frozen-lockfile --non-interactive
                       yarn ember build
-                      yarn test
+                      yarn test --no-sandbox --disable-setuid-sandbox
                   when:
                     stageStatus: All
                   failureStrategies: []
