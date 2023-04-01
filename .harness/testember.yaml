@@ -180,6 +180,8 @@ pipeline:
                   name: test
                   identifier: test
                   spec:
+                    connectorRef: harnessnew
+                    image: circleci/node:14
                     shell: Sh
                     command: |
                       sudo chmod -R 777 .
