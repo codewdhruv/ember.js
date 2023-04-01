@@ -145,8 +145,14 @@ pipeline:
                   name: Install dependencies
                   identifier: Install_dependencies
                   spec:
+                    connectorRef: harnessnew
+                    image: circleci/node:14
                     shell: Sh
-                    command: yarn install --frozen-lockfile --non-interactive
+                    command: |-
+                      yarn install --frozen-lockfile --non-interactive
+                      yarn ember build
+                      sudo chmod -R 777 .
+                      yarn test
                   when:
                     stageStatus: All
                   failureStrategies: []
